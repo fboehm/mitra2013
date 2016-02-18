@@ -20,30 +20,68 @@ update_binary <- function(evec # the vector e_-it
   return(e)
 }
 
-calc_bern_prob_binary <- function(evec, Gvec, beta, betavec, yvec, theta){
+
+#' Calculate a bernoulli probability for assigning e_it = 0 v. 1.
+#'
+#' @param evec a vector e[-i, t] from the e matrix
+#' @param Gvec a vector G[-i, i] from the graph matrix G
+#' @param beta a scalar (on the diagonal) beta[i, i] from beta matrix
+#' @param betavec a vector betamat[-i, i] from beta matrix
+#' @param y data matrix
+#' @param theta sampling parameters, a list
+
+calc_bern_prob_binary <- function(evec, Gvec, beta, betavec, y, theta){
   lik <- calc_lik_y(y, e, theta)
   mult0 <- calc_exp_binary(e = 0, evec, Gvec, beta, betavec)
   mult1 <- calc_exp_binary(e = 1, evec, Gvec, beta, betavec)
   return(lik*multiplier)
 }
 
+
+#' Calculate the exponential factor in updating e
+#'
+#' @param e a binary scalar
+#' @param evec a vector e[-i, t] from e matrix
+#' @param Gvec a vector G[-i, i] from G graph matrix
+#' @param beta a scalar from the diagonal of beta matrix
+#' @param betavec a vector betamatrix[-i, i] from beta matrix
+#' @return a single number
+
 calc_exp_binary <- function(e, evec, Gvec, beta, betavec){
   v_i <- boehm::expit(beta)
   v_vec <- boehm::expit(betavec)
   tmp <- (e - v_i) * (betavec %*% (evec - v_vec))[as.logical(Gvec)]
-  out <- beta * e + tmp
+  out <- exp(beta * e + tmp)
   return(out)
 }
 
-
-calc_lik_y <- function(yvec, e, theta){
-
+#' Calculate the likelihood given y, after equation 5 of Mitra et al. 2013
+#'
+#' @param y a scalar entry from y matrix
+#' @param e a scalar entry from binary e matrix
+#' @param theta a list of sampling parameters
+#' @return a likelihood, a scalar
+calc_lik_y <- function(yvec, evec, theta){
+  if (e == 0) {out <- dpois(x = y, lambda = theta$lambda) * (y < theta$c)}
+  if (e == 1) {
+    p1 <- dlnorm(y, meanlog = theta$mu1, sdlog = theta$sigma1)
+    p2 <- dlnorm(y, meanlog = theta$mu2, sdlog = theta$sigma2)
+    out <- p1 * pp + (1 - pp) * p2
+  }
+  return(out)
 }
 
-# wrapper to allow for updating every element in the matrix of binary indicators
-update_binary_mat <- function(e, G, beta, y, theta){
-  tmax <- ncol(e)
-  out <- e
+#' Wrapper function to update binary matrix
+#'
+#' @param emat a binary matrix
+#' @param Gmat a graph matrix
+#' @param betamat a beta matrix
+#' @param y data matrix
+#' @param theta sampling parameters, as a list
+#' @return binary matrix of same dimensions as emat, ie, an updated e matrix
+update_binary_mat <- function(emat, Gmat, betamat, y, theta){
+  tmax <- ncol(emat)
+  out <- emat
   for (t in 1:tmax){
     out[, t] <- update_binary(evec = e[-i, t], Gvec = G[-i, i], beta = beta[i,i], betavec = beta[-i, i], y = y, theta = theta)
   }
