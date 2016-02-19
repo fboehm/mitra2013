@@ -4,7 +4,20 @@
 \alias{update_trinary_mat}
 \title{Wrapper to update trinary matrix}
 \usage{
-update_trinary_mat(zmat)
+update_trinary_mat(emat, ymat, mu1vec, mu2vec, sd1vec, sd2vec)
+}
+\arguments{
+\item{emat}{a binary matrix}
+
+\item{ymat}{a data matrix}
+
+\item{mu1vec}{a mu vector}
+
+\item{mu2vec}{a mu vector}
+
+\item{sd1vec}{a sd vector}
+
+\item{sd2vec}{a sd vector}
 }
 \description{
 Wrapper to update trinary matrix

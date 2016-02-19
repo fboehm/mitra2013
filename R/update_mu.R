@@ -11,8 +11,8 @@
 update_mu <- function(muvec, sigmavec, ymat, zmat, indicator, mu0, t0){
   imax <- length(muvec)
   for (i in 1:imax){
-    tau <- (1 / sigmavec[i])^2
-    indic <- zmat[i,] == indicator
+    tau <- (1 / sigmavec[i]) ^ 2
+    indic <- zmat[i, ] == indicator
     n <- sum(indic)
     sumlogy <- sum(log(y[indic]))
     mm <- (t0 * mu0 + tau * sumlogy) / (t0 + n * tau)
