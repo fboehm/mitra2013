@@ -15,9 +15,12 @@ calc_bern_prob_binary(evec, Gvec, beta, betavec, y, theta)
 
 \item{betavec}{a vector betamat[-i, i] from beta matrix}
 
-\item{y}{data matrix}
+\item{y}{a scalar, the [i,t] entry of data matrix}
 
 \item{theta}{sampling parameters, a list}
+}
+\value{
+a scalar probability
 }
 \description{
 Calculate a bernoulli probability for assigning e_it = 0 v. 1.

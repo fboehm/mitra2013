@@ -15,7 +15,7 @@ update_binary(evec, Gvec, beta, betavec, y, theta)
 
 \item{betavec}{a vector from beta matrix, beta_matrix[i, -i]}
 
-\item{y}{data matrix}
+\item{y}{scalar entry from data matrix}
 
 \item{theta}{sampling distribution parameters, a list}
 }

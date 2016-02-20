@@ -1,10 +1,11 @@
 #' Update beta
 #'
+#' @param beta a beta matrix
+#' @param emat e binary matrix
 #' @param s standard deviation for jump
 #' @param K number of binary vectors to sample
 #' @export
 update_beta <- function(beta, emat, s, K = 5000){
-  imax <- nrow(beta)
   # create a proposed beta
   beta_prop <- beta
   diag(beta_prop) <- calc_beta_prop(diag(beta), sd = s)
@@ -29,7 +30,6 @@ update_beta <- function(beta, emat, s, K = 5000){
 #' @param beta_prop a proposed beta matrix
 #' @export
 calc_RR <- function(K = 5000, beta, beta_prop){
-  imax <- nrow(beta)
   # sample K binary vectors
   ratios <- numeric(length = K)
   for (k in 1:K){
@@ -61,7 +61,7 @@ sample_binary <- function(beta){
   }
   probs_normalized <- probs / sum(probs)
   samp <- sample(1:nvec, size = 1, prob = probs_normalized)
-  out <- as.numeric(vec_list[[i]])[-1]
+  out <- as.numeric(vec_list[[samp]])[-1]
   return(out)
 }
 

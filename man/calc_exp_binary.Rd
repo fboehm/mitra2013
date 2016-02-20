@@ -18,7 +18,7 @@ calc_exp_binary(e, evec, Gvec, beta, betavec)
 \item{betavec}{a vector betamatrix[-i, i] from beta matrix}
 }
 \value{
-a single number
+a scalar
 }
 \description{
 Calculate the exponential factor in updating e

@@ -4,7 +4,7 @@
 #' @param Gvec vector G_-it in Mitra 2013 notation
 #' @param beta a scalar, entry [i, i] of beta matrix
 #' @param betavec a vector from beta matrix, beta_matrix[i, -i]
-#' @param y data matrix
+#' @param y scalar entry from data matrix
 #' @param theta sampling distribution parameters, a list
 #' @return a binary scalar (0 or 1)
 #' @export
@@ -15,7 +15,7 @@ update_binary <- function(evec # the vector e_-it
                           , y,
                           theta
 ){
-  bern_prob <- calc_bern_prob_binary(evec, Gvec, beta, betavec, yvec, theta)
+  bern_prob <- calc_bern_prob_binary(evec, Gvec, beta, betavec, y, theta)
   e <- rbinom(n = 1, size = 1, prob = bern_prob)
   return(e)
 }
@@ -27,14 +27,20 @@ update_binary <- function(evec # the vector e_-it
 #' @param Gvec a vector G[-i, i] from the graph matrix G
 #' @param beta a scalar (on the diagonal) beta[i, i] from beta matrix
 #' @param betavec a vector betamat[-i, i] from beta matrix
-#' @param y data matrix
+#' @param y a scalar, the [i,t] entry of data matrix
 #' @param theta sampling parameters, a list
+#' @return a scalar probability
+#' @export
 
 calc_bern_prob_binary <- function(evec, Gvec, beta, betavec, y, theta){
-  lik <- calc_lik_y(y, e, theta)
-  mult0 <- calc_exp_binary(e = 0, evec, Gvec, beta, betavec)
-  mult1 <- calc_exp_binary(e = 1, evec, Gvec, beta, betavec)
-  return(lik*multiplier)
+  p0 <- calc_exp_binary(e = 0, evec, Gvec, beta, betavec)
+  p1 <- calc_exp_binary(e = 1, evec, Gvec, beta, betavec)
+  # calc likelihoods
+  l0 <- calc_lik_y(y, e = 0, theta)
+  l1 <- calc_lik_y(y, e = 1, theta)
+  # calc bern prob
+  out <- p1 * l1 / (p0 * l0 + p1 * l1)
+  return(out)
 }
 
 
@@ -45,8 +51,8 @@ calc_bern_prob_binary <- function(evec, Gvec, beta, betavec, y, theta){
 #' @param Gvec a vector G[-i, i] from G graph matrix
 #' @param beta a scalar from the diagonal of beta matrix
 #' @param betavec a vector betamatrix[-i, i] from beta matrix
-#' @return a single number
-
+#' @return a scalar
+#' @export
 calc_exp_binary <- function(e, evec, Gvec, beta, betavec){
   v_i <- boehm::expit(beta)
   v_vec <- boehm::expit(betavec)
@@ -61,7 +67,8 @@ calc_exp_binary <- function(e, evec, Gvec, beta, betavec){
 #' @param e a scalar entry from binary e matrix
 #' @param theta a list of sampling parameters
 #' @return a likelihood, a scalar
-calc_lik_y <- function(yvec, evec, theta){
+#' @export
+calc_lik_y <- function(y, e, theta){
   if (e == 0) {out <- dpois(x = y, lambda = theta$lambda) * (y < theta$c)}
   if (e == 1) {
     p1 <- dlnorm(y, meanlog = theta$mu1, sdlog = theta$sigma1)
@@ -79,6 +86,7 @@ calc_lik_y <- function(yvec, evec, theta){
 #' @param y data matrix
 #' @param theta sampling parameters, as a list
 #' @return binary matrix of same dimensions as emat, ie, an updated e matrix
+#' @export
 update_binary_mat <- function(emat, Gmat, betamat, y, theta){
   tmax <- ncol(emat)
   out <- emat

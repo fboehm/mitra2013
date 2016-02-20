@@ -4,14 +4,14 @@
 \alias{calc_lik_y}
 \title{Calculate the likelihood given y, after equation 5 of Mitra et al. 2013}
 \usage{
-calc_lik_y(yvec, evec, theta)
+calc_lik_y(y, e, theta)
 }
 \arguments{
-\item{theta}{a list of sampling parameters}
-
 \item{y}{a scalar entry from y matrix}
 
 \item{e}{a scalar entry from binary e matrix}
+
+\item{theta}{a list of sampling parameters}
 }
 \value{
 a likelihood, a scalar

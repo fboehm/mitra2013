@@ -7,6 +7,10 @@
 update_beta(beta, emat, s, K = 5000)
 }
 \arguments{
+\item{beta}{a beta matrix}
+
+\item{emat}{e binary matrix}
+
 \item{s}{standard deviation for jump}
 
 \item{K}{number of binary vectors to sample}
