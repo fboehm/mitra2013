@@ -14,7 +14,7 @@ update_mu <- function(muvec, sigmavec, ymat, zmat, indicator, mu0, t0){
     tau <- (1 / sigmavec[i]) ^ 2
     indic <- zmat[i, ] == indicator
     n <- sum(indic)
-    sumlogy <- sum(log(y[indic]))
+    sumlogy <- sum(log(ymat[i, indic]))
     mm <- (t0 * mu0 + tau * sumlogy) / (t0 + n * tau)
     prec <- t0 + n * tau
     muvec[i] <- rnorm(n = 1, mean = mm, sd = sqrt(1 / prec))

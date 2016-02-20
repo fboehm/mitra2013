@@ -8,12 +8,11 @@
 #' @export
 update_lambda <- function(lambdavec, ymat, zmat, a, b){
   imax <- nrow(ymat)
-  tmax <- ncol(ymat)
   out <- lambdavec
   for (i in 1:imax){
     indic <- zmat[i,] == -1
     n <- sum(indic)
-    sumy <- sum(y[indic])
+    sumy <- sum(ymat[i, indic])
     out[i] <- rgamma(n = 1, shape = a + sumy, rate = b + n)
   }
 }

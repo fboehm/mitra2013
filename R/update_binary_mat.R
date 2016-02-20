@@ -69,11 +69,13 @@ calc_exp_binary <- function(e, evec, Gvec, beta, betavec){
 #' @return a likelihood, a scalar
 #' @export
 calc_lik_y <- function(y, e, theta){
-  if (e == 0) {out <- dpois(x = y, lambda = theta$lambda) * (y < theta$c)}
+  if (e == 0) {
+    out <- dpois(x = y, lambda = theta$lambda) * (y < theta$c)
+  }
   if (e == 1) {
     p1 <- dlnorm(y, meanlog = theta$mu1, sdlog = theta$sigma1)
     p2 <- dlnorm(y, meanlog = theta$mu2, sdlog = theta$sigma2)
-    out <- p1 * pp + (1 - pp) * p2
+    out <- p1 * theta$pp + (1 - theta$pp) * p2
   }
   return(out)
 }
@@ -81,17 +83,24 @@ calc_lik_y <- function(y, e, theta){
 #' Wrapper function to update binary matrix
 #'
 #' @param emat a binary matrix
-#' @param Gmat a graph matrix
+#' @param G a graph matrix
 #' @param betamat a beta matrix
-#' @param y data matrix
+#' @param ymat data matrix
 #' @param theta sampling parameters, as a list
 #' @return binary matrix of same dimensions as emat, ie, an updated e matrix
 #' @export
-update_binary_mat <- function(emat, Gmat, betamat, y, theta){
+update_binary_mat <- function(emat, G, betamat, y, theta){
   tmax <- ncol(emat)
+  imax <- nrow(emat)
   out <- emat
   for (t in 1:tmax){
-    out[, t] <- update_binary(evec = e[-i, t], Gvec = G[-i, i], beta = beta[i,i], betavec = beta[-i, i], y = y, theta = theta)
+    for (i in 1:imax){
+      out[, t] <- update_binary(evec = emat[-i, t],
+                                Gvec = G[-i, i], beta = betamat[i, i],
+                                betavec = betamat[-i, i], y = y[i, t],
+                                theta = theta)
+
+    }
   }
   return(out)
 }

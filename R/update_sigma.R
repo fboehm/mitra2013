@@ -15,7 +15,7 @@ update_sigma <- function(sigmavec, ymat, muvec, zmat, indicator, a0, b0){
   for (i in 1:imax){
     indic <- zmat[i, ] == indicator
     n <- sum(indic)
-    additive_term<- sum((log(y[indic]) - mu[i]) ^ 2)
+    additive_term <- sum((log(ymat[i, indic]) - muvec[i]) ^ 2)
     bnew <- additive_term / 2 + b0
     anew <- a0 + n / 2
     precvec[i] <- rgamma(n = 1, shape = anew, rate = bnew)

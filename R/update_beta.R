@@ -13,13 +13,21 @@ update_beta <- function(beta, emat, s, K = 5000){
   normalizing_constant_ratio <- calc_RR(beta = beta, beta_prop = beta_prop)
   # note that the above is c(beta_prop) / c(beta), so we need to divide by
   # normalizing_constant_ratio when calculating acceptance ratio
-  K_beta_prop <- exp(sum(apply(FUN = calc_logist_prob, X = emat, MARGIN = 2, beta = beta_prop)))
-  K_beta <- exp(sum(apply(FUN = calc_logist_prob, X = emat, MARGIN = 2, beta = beta)))
+  K_beta_prop <- exp(sum(apply(FUN = calc_logist_prob,
+                               X = emat, MARGIN = 2, beta = beta_prop)))
+  K_beta <- exp(sum(apply(FUN = calc_logist_prob,
+                          X = emat, MARGIN = 2, beta = beta)))
   p_beta_prop <- dnorm(beta_prop, mean = 0, sd = sqrt(0.3))
   p_beta <- dnorm(beta, mean = 0, sd = sqrt(0.3))
-  acc_ratio<- p_beta_prop * K_beta_prop / (p_beta * K_beta * normalizing_constant_ratio)
+  acc_ratio <- p_beta_prop * K_beta_prop /
+    (p_beta * K_beta * normalizing_constant_ratio)
   u <- runif(n = 1)
-  if (u < acc_ratio) {out <- beta_prop} else {out <- beta}
+  if (u < acc_ratio) {
+    out <- beta_prop
+  }
+  else {
+    out <- beta
+    }
   return(out)
 }
 
@@ -49,7 +57,7 @@ calc_RR <- function(K = 5000, beta, beta_prop){
 sample_binary <- function(beta){
   imax <- nrow(beta)
   nvec <- 2 ^ imax
-  inds <- nvec:(2*nvec - 1)
+  inds <- nvec:(2 * nvec - 1)
   foovecs <- R.utils::intToBin(inds)
   vec_list <- stringr::str_split(foovecs, "")
   probs <- numeric(length = nvec)
@@ -74,7 +82,8 @@ sample_binary <- function(beta){
 #' @export
 calc_logist_prob <- function(v, beta){
   term1 <- diag(beta) %*% v
-  foo_mat <- beta * (v - boehm::expit(diag(beta))) %*% t((v - boehm::expit(diag(beta))))
+  foo_mat <- beta * (v - boehm::expit(diag(beta))) %*%
+    t((v - boehm::expit(diag(beta))))
   term2 <- sum(foo_mat[lower.tri(foo_mat)])
   return(term1 + term2)
 }
