@@ -28,5 +28,25 @@ update_G <- function(G, betamat, emat){
     #symmetrize
     betamatprop[indmax, indmin] <- betamatprop[indmin, indmax]
   }
-
+  # We now have a pair: betamatprop and Gprop
+  # We must calculate the acceptance probability
+  normalizing_constant_ratio <- calc_RR(beta = beta, beta_prop = beta_prop)
+  # note that the above is c(beta_prop) / c(beta), so we need to divide by
+  # normalizing_constant_ratio when calculating acceptance ratio
+  K_beta_prop <- exp(sum(apply(FUN = calc_logist_prob,
+                               X = emat, MARGIN = 2, beta = beta_prop)))
+  K_beta <- exp(sum(apply(FUN = calc_logist_prob,
+                          X = emat, MARGIN = 2, beta = beta)))
+  p_beta_prop <- dnorm(beta_prop, mean = 0, sd = sqrt(0.3))
+  p_beta <- dnorm(beta, mean = 0, sd = sqrt(0.3))
+  acc_ratio <- p_beta_prop * K_beta_prop /
+    (p_beta * K_beta * normalizing_constant_ratio)
+  u <- runif(n = 1)
+  if (u < acc_ratio) {
+    out <- list(beta = betamatprop, G = Gprop)
+  }
+  else{
+    out <- list(beta = betamat, G = G)
+  }
+  return(out)
 }
