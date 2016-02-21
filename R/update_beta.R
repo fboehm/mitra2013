@@ -43,7 +43,7 @@ calc_RR <- function(K = 5000, beta, beta_prop){
   foo <- calc_sampling_probs(beta)
   sampled_cols <- sample_columns(probs = foo$probs, vecmat = foo$vecmat)
   for (k in 1:K){
-    v <- sample_cols[,k]
+    v <- sampled_cols[,k]
     K_beta <- calc_logist_prob(v, beta)
     K_beta_prop <- calc_logist_prob(v, beta_prop)
     ratios[k] <- exp(K_beta_prop - K_beta)
@@ -84,7 +84,7 @@ return(list(probs = probs_normalized, vecmat = vecmat))
 #' @export
 sample_columns <- function(probs, vecmat, K = 5000){
   nvec <- length(probs)
-  samp <- sample(1:nvec, size = K, prob = probs_normalized)
+  samp <- sample(1:nvec, size = K, prob = probs)
   out <- vecmat[, samp]
   return(out)
 }
