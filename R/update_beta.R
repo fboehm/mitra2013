@@ -40,8 +40,10 @@ update_beta <- function(beta, emat, s, K = 5000){
 calc_RR <- function(K = 5000, beta, beta_prop){
   # sample K binary vectors
   ratios <- numeric(length = K)
+  foo <- calc_sampling_probs(beta)
+  sampled_cols <- sample_columns(probs = foo$probs, vecmat = foo$vecmat)
   for (k in 1:K){
-    v <- sample_binary(beta)
+    v <- sample_cols[,k]
     K_beta <- calc_logist_prob(v, beta)
     K_beta_prop <- calc_logist_prob(v, beta_prop)
     ratios[k] <- exp(K_beta_prop - K_beta)
@@ -54,7 +56,7 @@ calc_RR <- function(K = 5000, beta, beta_prop){
 #'
 #' @param beta a beta matrix of coefficients
 #' @export
-sample_binary <- function(beta){
+calc_sampling_probs <- function(beta){
   imax <- nrow(beta)
   nvec <- 2 ^ imax
   inds <- nvec:(2 * nvec - 1)
@@ -68,8 +70,22 @@ sample_binary <- function(beta){
     probs[i] <- exp(calc_logist_prob(v = vec, beta = beta))
   }
   probs_normalized <- probs / sum(probs)
-  samp <- sample(1:nvec, size = 1, prob = probs_normalized)
-  out <- as.numeric(vec_list[[samp]])[-1]
+  # process vec_list
+  vecmat <- sapply(FUN = function(x)as.numeric(x)[-1], X = vec_list)
+return(list(probs = probs_normalized, vecmat = vecmat))
+}
+
+
+#' Sample columns according to specified probabilities
+#'
+#' @param probs probabilities vector
+#' @param vecmat a matrix from which to sample columns
+#' @param K number of times to sample
+#' @export
+sample_columns <- function(probs, vecmat, K = 5000){
+  nvec <- length(probs)
+  samp <- sample(1:nvec, size = K, prob = probs_normalized)
+  out <- vecmat[, samp]
   return(out)
 }
 
