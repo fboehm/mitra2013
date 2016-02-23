@@ -8,7 +8,7 @@
 #' @param mu0 hyperparameter, mean of normal hyperprior
 #' @param t0 hyperparameter, precision of normal hyperprior
 #' @export
-update_mu <- function(muvec, sigmavec, ymat, zmat, indicator, mu0, t0){
+update_mu <- function(muvec, sigmavec, ymat, zmat, indicator, mu0 = 0, t0 = 1 / 1000000){
   imax <- length(muvec)
   for (i in 1:imax){
     tau <- (1 / sigmavec[i]) ^ 2

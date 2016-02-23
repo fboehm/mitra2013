@@ -9,7 +9,8 @@
 #' @param b0 hyperparameter, rate parameter of hyperprior
 #' @export
 
-update_sigma <- function(sigmavec, ymat, muvec, zmat, indicator, a0, b0){
+update_sigma <- function(sigmavec, ymat, muvec, zmat,
+                         indicator, a0 = 0.001, b0 = 0.001){
   precvec <- 1 / sigmavec ^ 2
   imax <- length(sigmavec)
   for (i in 1:imax){

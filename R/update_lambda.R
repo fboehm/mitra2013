@@ -6,7 +6,7 @@
 #' @param a gamma hyperprior
 #' @param b gamma hyperprior
 #' @export
-update_lambda <- function(lambdavec, ymat, zmat, a, b){
+update_lambda <- function(lambdavec, ymat, zmat, a = 0.001, b = 0.001){
   imax <- nrow(ymat)
   out <- lambdavec
   for (i in 1:imax){
