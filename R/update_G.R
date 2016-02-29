@@ -35,14 +35,17 @@ update_G <- function(G, betamat, emat){
   normalizing_constant_ratio <- calc_RR(beta = betamat, beta_prop = betamatprop)
   # note that the above is c(beta_prop) / c(beta), so we need to divide by
   # normalizing_constant_ratio when calculating acceptance ratio
-  K_beta_prop <- exp(sum(apply(FUN = calc_logist_prob,
-                               X = emat, MARGIN = 2, beta = betamatprop)))
-  K_beta <- exp(sum(apply(FUN = calc_logist_prob,
-                          X = emat, MARGIN = 2, beta = betamat)))
-  p_beta_prop <- dnorm(betamatprop, mean = 0, sd = sqrt(0.3))
-  p_beta <- dnorm(betamat, mean = 0, sd = sqrt(0.3))
-  acc_ratio <- p_beta_prop * K_beta_prop /
-    (p_beta * K_beta * normalizing_constant_ratio)
+  logK_beta_propvec <- apply(FUN = calc_logist_prob,
+                             X = emat, MARGIN = 2, beta = beta_prop)
+  logK_betavec <- apply(FUN = calc_logist_prob,
+                        X = emat, MARGIN = 2, beta = beta)
+  logK_diff <- logK_beta_propvec - logK_betavec
+  logKratio <- sum(logK_diff)
+  logp_beta_prop <- dnorm(beta_prop, mean = 0, sd = sqrt(0.3), log = TRUE) # matrix
+  logp_beta <- dnorm(beta, mean = 0, sd = sqrt(0.3), log = TRUE) # matrix
+  logacc_ratio <- logKratio - log(normalizing_constant_ratio) +
+    sum(logp_beta_prop - logp_beta)
+  acc_ratio <- exp(logacc_ratio)
   u <- runif(n = 1)
   if (u < acc_ratio) {
     out <- list(beta = betamatprop, G = Gprop)
