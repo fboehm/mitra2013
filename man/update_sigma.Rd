@@ -4,7 +4,7 @@
 \alias{update_sigma}
 \title{Update a sigma vector}
 \usage{
-update_sigma(sigmavec, ymat, muvec, zmat, indicator, a0, b0)
+update_sigma(sigmavec, ymat, muvec, zmat, indicator, a0 = 0.001, b0 = 0.001)
 }
 \arguments{
 \item{sigmavec}{an inputted sigmavec}

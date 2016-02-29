@@ -4,7 +4,7 @@
 \alias{update_lambda}
 \title{Update the lambda vector}
 \usage{
-update_lambda(lambdavec, ymat, zmat, a, b)
+update_lambda(lambdavec, ymat, zmat, a = 0.001, b = 0.001)
 }
 \arguments{
 \item{lambdavec}{a lambda vector of Poisson means}

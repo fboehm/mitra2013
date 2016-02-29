@@ -4,26 +4,26 @@
 #' @param betamat a beta matrix
 #' @param emat an e matrix of binary indicators
 #' @export
-update_G <- function(G, betamat, emat){
+update_graph <- function(graph, betamat, emat){
   # make a candidate Gprop
   # sample two indices & order them
   imax <- nrow(betamat)
   indices <- sample(1:imax, size = 2, replace = FALSE)
   indmax <- max(indices)
   indmin <- min(indices)
-  Gprop <- G
-  Gprop[indmin, indmax] <- 1 - Gprop[indmin, indmax] # switch one entry
+  graph_prop <- graph
+  graph_prop[indmin, indmax] <- 1 - graph_prop[indmin, indmax] # switch one entry
   # symmetrize Gprop
-  Gprop[indmax, indmin] <-  Gprop[indmin, indmax]
+  graph_prop[indmax, indmin] <-  graph_prop[indmin, indmax]
   # define betamatprop
   betamatprop <- betamat
   # if we changed the G entry from 1 to 0, we need to change
   # corresponding entry of beta to 0
-  if (G[indmin, indmax] == 1){
+  if (graph[indmin, indmax] == 1){
     betamatprop[indmin, indmax] <- 0
     betamatprop[indmax, indmin] <- 0 #symmetrize
   }
-  if (G[indmin, indmax] == 0){
+  if (graph[indmin, indmax] == 0){
     betamatprop[indmin, indmax] <- rnorm(n = 1,
                                          mean = betamatprop[indmin, indmax],
                                          sd = 0.1)
@@ -36,22 +36,22 @@ update_G <- function(G, betamat, emat){
   # note that the above is c(beta_prop) / c(beta), so we need to divide by
   # normalizing_constant_ratio when calculating acceptance ratio
   logK_beta_propvec <- apply(FUN = calc_logist_prob,
-                             X = emat, MARGIN = 2, beta = beta_prop)
+                             X = binary, MARGIN = 2, beta = betamatprop)
   logK_betavec <- apply(FUN = calc_logist_prob,
-                        X = emat, MARGIN = 2, beta = beta)
+                        X = binary, MARGIN = 2, beta = betamat)
   logK_diff <- logK_beta_propvec - logK_betavec
   logKratio <- sum(logK_diff)
-  logp_beta_prop <- dnorm(beta_prop, mean = 0, sd = sqrt(0.3), log = TRUE) # matrix
-  logp_beta <- dnorm(beta, mean = 0, sd = sqrt(0.3), log = TRUE) # matrix
+  logp_beta_prop <- dnorm(betamatprop, mean = 0, sd = sqrt(0.3), log = TRUE) # matrix
+  logp_beta <- dnorm(betamat, mean = 0, sd = sqrt(0.3), log = TRUE) # matrix
   logacc_ratio <- logKratio - log(normalizing_constant_ratio) +
     sum(logp_beta_prop - logp_beta)
   acc_ratio <- exp(logacc_ratio)
   u <- runif(n = 1)
   if (u < acc_ratio) {
-    out <- list(beta = betamatprop, G = Gprop)
+    out <- list(beta = betamatprop, graph = graph_prop)
   }
   else{
-    out <- list(beta = betamat, G = G)
+    out <- list(beta = betamat, graph = graph)
   }
   return(out)
 }

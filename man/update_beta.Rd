@@ -4,7 +4,7 @@
 \alias{update_beta}
 \title{Update beta}
 \usage{
-update_beta(beta, emat, s, K = 5000)
+update_beta(beta, emat, s = 0.1, K = 5000)
 }
 \arguments{
 \item{beta}{a beta matrix}

@@ -4,7 +4,7 @@
 \alias{update_mu}
 \title{Update a mu vector (mu1 or mu2)}
 \usage{
-update_mu(muvec, sigmavec, ymat, zmat, indicator, mu0, t0)
+update_mu(muvec, sigmavec, ymat, zmat, indicator, mu0 = 0, t0 = 1/1e+06)
 }
 \arguments{
 \item{muvec}{mu vector to be updated}
