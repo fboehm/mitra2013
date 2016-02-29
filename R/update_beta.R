@@ -5,7 +5,7 @@
 #' @param s standard deviation for jump
 #' @param K number of binary vectors to sample
 #' @export
-update_beta <- function(beta, emat, s, K = 5000){
+update_beta <- function(beta, emat, s = 0.1, K = 5000){
   # create a proposed beta
   beta_prop <- beta
   diag(beta_prop) <- calc_beta_prop(diag(beta), sd = s)
@@ -13,14 +13,17 @@ update_beta <- function(beta, emat, s, K = 5000){
   normalizing_constant_ratio <- calc_RR(beta = beta, beta_prop = beta_prop)
   # note that the above is c(beta_prop) / c(beta), so we need to divide by
   # normalizing_constant_ratio when calculating acceptance ratio
-  K_beta_prop <- exp(sum(apply(FUN = calc_logist_prob,
-                               X = emat, MARGIN = 2, beta = beta_prop)))
-  K_beta <- exp(sum(apply(FUN = calc_logist_prob,
-                          X = emat, MARGIN = 2, beta = beta)))
-  p_beta_prop <- dnorm(beta_prop, mean = 0, sd = sqrt(0.3))
-  p_beta <- dnorm(beta, mean = 0, sd = sqrt(0.3))
-  acc_ratio <- p_beta_prop * K_beta_prop /
-    (p_beta * K_beta * normalizing_constant_ratio)
+  logK_beta_propvec <- apply(FUN = calc_logist_prob,
+                               X = emat, MARGIN = 2, beta = beta_prop)
+  logK_betavec <- apply(FUN = calc_logist_prob,
+                          X = emat, MARGIN = 2, beta = beta)
+  logK_diff <- logK_beta_propvec - logK_betavec
+  logKratio <- sum(logK_diff)
+  logp_beta_prop <- dnorm(beta_prop, mean = 0, sd = sqrt(0.3), log = TRUE) # matrix
+  logp_beta <- dnorm(beta, mean = 0, sd = sqrt(0.3), log = TRUE) # matrix
+  logacc_ratio <- logKratio - log(normalizing_constant_ratio) +
+    sum(logp_beta_prop - logp_beta)
+  acc_ratio <- exp(logacc_ratio)
   u <- runif(n = 1)
   if (u < acc_ratio) {
     out <- beta_prop
@@ -84,7 +87,7 @@ return(list(probs = probs_normalized, vecmat = vecmat))
 #' @export
 sample_columns <- function(probs, vecmat, K = 5000){
   nvec <- length(probs)
-  samp <- sample(1:nvec, size = K, prob = probs)
+  samp <- sample(1:nvec, size = K, prob = probs, replace = TRUE)
   out <- vecmat[, samp]
   return(out)
 }
